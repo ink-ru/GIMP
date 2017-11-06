@@ -7,30 +7,25 @@ from gimpfu import *
 
 def resize_image(width):
 	image = gimp.image_list()[0]
-
-	if image.width < width:
-		height = (1/(image.width/width))*image.height
-	else:
-		height = image.height/(image.width/width)
+	height = image.height/(image.width/width)
 	pdb.gimp_image_scale(image, width, height)
 
 def scale_image(width, bg_color, ratio):
 	image = gimp.image_list()[0]
 
-	offx = 0
-	offy = 0
+	offx = offy = 0
 
-	# ratio = 3/2 # 1.5
-	current_ratio = (image.width/image.height)
+	current_ratio = float(image.width/image.height)
 
-	if current_ratio > ratio: # исходная ширина больше
-		new_width = image.width
-		new_height = image.width*(1/ratio)
-		offy = (new_height-image.height)/2
-	else:
-		new_width = image.width*ratio
-		new_height = image.height
-		offx = (new_width-image.width)/2
+	if current_ratio != ratio:
+		if current_ratio >= ratio:
+			new_width = image.width
+			new_height = image.width/ratio
+			offy = (new_height-image.height)/2
+		else:
+			new_width = image.height*ratio
+			new_height = image.height
+			offx = (new_width-image.width)/2
 
 	pdb.gimp_image_resize (image,new_width,new_height,offx,offy) # pdb.gimp_image_resize
 
@@ -72,10 +67,10 @@ register(
 		 "Resize & scale",
 		 "*",
 		 [
-		  (PF_INT, "width", "New width", 695), # (PF_IMAGE, "image", "Исходное изображение", None),
-		  (PF_COLOR, "bg_color",  "Цвет фона", (255,255,255)),
-		  (PF_FLOAT, "ratio", "Соотношение сторон (3:2)", 1.5),
-		  ],
+			(PF_INT, "width", "New width", 695), # (PF_IMAGE, "image", "Исходное изображение", None),
+			(PF_COLOR, "bg_color",  "Цвет фона", (255,255,255)),
+			(PF_FLOAT, "ratio", "Соотношение сторон (3:2)", 1.5),
+			],
 		 [],
 		 scale_and_crop_image,
 		 menu="<Image>/DoItUp"
