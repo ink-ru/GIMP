@@ -39,6 +39,31 @@ def scale_image(width, bg_color, ratio):
 	# Обновляем изоборажение на дисплее
 	pdb.gimp_displays_flush()
 
+def savePNG(image,filename):
+	"""Saves composed image to filename"""
+	layers = image.layers
+	last_layer = len(layers)-1
+	try:
+		disable=pdb.gimp_image_undo_disable(image)
+		pdb.gimp_layer_add_alpha(layers[0])
+		pdb.plug_in_colortoalpha(image,image.active_layer,(0,0,0))
+		layer = pdb.gimp_image_merge_visible_layers(image, 1)
+		enable = pdb.gimp_image_undo_enable(image)
+		pdb.file_png_save(image, image.active_layer, filename, filename, 0,9,1,0,0,1,1)
+	except Exception as e:
+		raise e
+
+def save(image,filename):
+	layers = image.layers
+	last_layer = len(layers)-1
+	try:
+		disable = pdb.gimp_image_undo_disable(image)
+		layer = pdb.gimp_image_merge_visible_layers(image, 1)
+		enable = pdb.gimp_image_undo_enable(image)
+		pdb.gimp_file_save(image, image.active_layer, filename, '?')
+	except Exception as e:
+		raise e
+
 def scale_and_crop_image(width, bg_color, ratio):
 	image = gimp.image_list()[0]
 	width = float(width)
@@ -56,6 +81,8 @@ def scale_and_crop_image(width, bg_color, ratio):
 	pdb.gimp_image_undo_group_end(image)
 	pdb.gimp_context_pop()
 
+	save(image, pdb.gimp_image_get_filename(image)) # pdb.gimp_image_get_uri(image)
+
 
 register(
 		 "python-fu-resize-scale",
@@ -67,13 +94,16 @@ register(
 		 "Resize & scale",
 		 "*",
 		 [
+			# (PF_FILE, "ifile", N_("Color input file:"), 'default\\input\\colorfile\\path\\colorlist.txt'),
 			(PF_INT, "width", "New width", 695), # (PF_IMAGE, "image", "Исходное изображение", None),
 			(PF_COLOR, "bg_color",  "Цвет фона", (255,255,255)),
 			(PF_FLOAT, "ratio", "Соотношение сторон (3:2)", 1.5),
+			# (PF_DIRNAME, "odir", N_("Path for png export:"), str(os.getcwd())),
 			],
 		 [],
 		 scale_and_crop_image,
-		 menu="<Image>/DoItUp"
+		 menu="<Image>/Filters/DoItUp",
+		 domain=("gimp20-python", gimp.locale_directory)
 )
 
 main()
