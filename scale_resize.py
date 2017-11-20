@@ -1,7 +1,9 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from __future__ import division
 from gimpfu import *
+# import os
 
 # https://habrahabr.ru/post/135863/
 
@@ -65,7 +67,7 @@ def save(image,filename):
 		raise e
 
 def scale_and_crop_image(width, bg_color, ratio):
-	image = gimp.image_list()[0]
+	image = gimp.image_list()[0] # TODO: do for all images in a loop
 	width = float(width)
 
 	pdb.gimp_context_push()
@@ -83,6 +85,14 @@ def scale_and_crop_image(width, bg_color, ratio):
 
 	save(image, pdb.gimp_image_get_filename(image)) # pdb.gimp_image_get_uri(image)
 
+	pdb.gimp_message('Done!')
+
+	# pdb.gimp_image_clean_all(image)
+	# pdb.gimp_display_delete(gimp.Display(image))
+	# pdb.gimp_quit(1)
+
+	return
+
 
 register(
 		 "python-fu-resize-scale",
@@ -92,7 +102,7 @@ register(
 		 "Васин Юрий",
 		 "2017",
 		 "Resize & scale",
-		 "*",
+		 "*", # image type
 		 [
 			# (PF_FILE, "ifile", N_("Color input file:"), 'default\\input\\colorfile\\path\\colorlist.txt'),
 			(PF_INT, "width", "New width", 695), # (PF_IMAGE, "image", "Исходное изображение", None),
