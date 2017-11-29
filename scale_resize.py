@@ -18,6 +18,8 @@ def scale_image(width, bg_color, ratio):
 	offx = offy = 0
 
 	current_ratio = float(image.width/image.height)
+	new_width = image.width
+	new_height = image.height
 
 	if current_ratio != ratio:
 		if current_ratio >= ratio:
@@ -66,7 +68,7 @@ def save(image,filename):
 	except Exception as e:
 		raise e
 
-def scale_and_crop_image(width, bg_color, ratio):
+def scale_and_crop_image(width, bg_color, ratio, save_flag):
 	image = gimp.image_list()[0] # TODO: do for all images in a loop
 	width = float(width)
 
@@ -79,13 +81,14 @@ def scale_and_crop_image(width, bg_color, ratio):
 	scale_image(width, bg_color, ratio)
 	resize_image(width)
 
-	# Разрешаем запись информации для отмены действий
 	pdb.gimp_image_undo_group_end(image)
 	pdb.gimp_context_pop()
 
-	save(image, pdb.gimp_image_get_filename(image)) # pdb.gimp_image_get_uri(image)
-
-	pdb.gimp_message('Done!')
+	if save_flag == True:
+		save(image, pdb.gimp_image_get_filename(image)) # pdb.gimp_image_get_uri(image)
+		pdb.gimp_message('Новое изображение сохранено!')
+	else:
+		pdb.gimp_message('Done!')
 
 	# pdb.gimp_image_clean_all(image)
 	# pdb.gimp_display_delete(gimp.Display(image))
@@ -105,9 +108,10 @@ register(
 		 "*", # image type
 		 [
 			# (PF_FILE, "ifile", N_("Color input file:"), 'default\\input\\colorfile\\path\\colorlist.txt'),
-			(PF_INT, "width", "New width", 695), # (PF_IMAGE, "image", "Исходное изображение", None),
+			(PF_INT, "width", "Требуемая ширина", 695), # (PF_IMAGE, "image", "Исходное изображение", None),
 			(PF_COLOR, "bg_color",  "Цвет фона", (255,255,255)),
 			(PF_FLOAT, "ratio", "Соотношение сторон (3:2)", 1.5),
+			(PF_TOGGLE, "save_flag", "Перезаписать изображение", True),
 			# (PF_DIRNAME, "odir", N_("Path for png export:"), str(os.getcwd())),
 			],
 		 [],
