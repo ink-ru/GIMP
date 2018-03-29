@@ -5,3 +5,4 @@ scale_resize.py - обрезает и меняет размер изображе
 Подробную инструкцию можно найтит тут - https://github.com/ink-ru/GIMP/wiki
 
 Пример элементов управления - http://registry.gimp.org/files/demo-plugin-GUI.py
+Документация - https://www.gimp.org/docs/python/index.html
